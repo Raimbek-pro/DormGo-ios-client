@@ -35,7 +35,7 @@ struct PostsResponse: Codable {
     var restPosts: [Post]
 }
 //https://8035-2-135-65-38.ngrok-free.app
-let baseURL = URL(string: "http://localhost:8080")! // https://dormgo.azurewebsites.net    http://localhost:8080
+let baseURL = URL(string: "https://1541-37-99-17-207.ngrok-free.app")! // https://dormgo.azurewebsites.net    http://localhost:8080
 
 
 
@@ -85,13 +85,13 @@ class PostAPIManager{
         
         // Use the dynamic body passed into the function
         let body: [String: Any] = [
-            "Title":Title,
-            "Description": Description,
-            "CurrentPrice": CurrentPrice,
-            "Latitude": Latitude,
-            "Longitude": Longitude,
-            "CreatedAt": CreatedAt,
-            "MaxPeople": MaxPeople,
+            "title":Title,
+            "description": Description,
+            "currentPrice": CurrentPrice,
+            "latitude": Latitude,
+            "longitude": Longitude,
+          
+            "maxPeople": MaxPeople,
             
         ]
         
