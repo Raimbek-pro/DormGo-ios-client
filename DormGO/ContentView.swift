@@ -46,15 +46,15 @@ struct ContentView: View {
            // Initialize the `user` and `posts` with default values
            if isPreview {
                _user = State(initialValue: ProfileInfo(id: "1", email: "preview@example.com", name: "Preview User", registeredAt: Date()))
-               _posts = State(initialValue: PostsResponse(yourPosts: [], restPosts: []))  // Simulated empty posts for preview
+               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: []))  // Simulated empty posts for preview
                isAuthenticated = true  // Simulate logged-in state for preview
            } else if let _ = getJWTFromKeychain(tokenType: "access_token") {
                _user = State(initialValue: ProfileInfo(id: "1", email: "user@example.com", name: "Authenticated User", registeredAt: Date()))
-               _posts = State(initialValue: PostsResponse(yourPosts: [], restPosts: []))  // Add real posts if necessary
+               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: []))  // Add real posts if necessary
                isAuthenticated = true
            } else {
                _user = State(initialValue: ProfileInfo(id: "1", email: "", name: "", registeredAt: Date()))
-               _posts = State(initialValue: PostsResponse(yourPosts: [], restPosts: []))  // Empty posts if not authenticated
+               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: []))  // Empty posts if not authenticated
                isAuthenticated = false
            }
        }
@@ -79,7 +79,7 @@ struct ContentView: View {
         isAuthenticated = false
     }
     var body: some View {
-        Group {
+        
             if isAuthenticated {
                 MainView(user: user, posts: posts, signalRManager: signalRManager, logoutAction: {
                     // Delete both the access and refresh tokens
@@ -121,12 +121,10 @@ struct ContentView: View {
                     isAuthenticated = false
                 })
             } else {
-                AuthenticationView(onAuthenticated: {
-                    isAuthenticated = true
-                })
+                AuthenticationView(isAuthenticated: $isAuthenticated)
             }
             
-        }
+        
         
     }
 }
@@ -316,7 +314,7 @@ struct MainView: View {
     @State private var isSheet2Presented = false
     let columns = [GridItem(.adaptive(minimum: 150))]
     @State private var user: ProfileInfo
-    @State private var posts: PostsResponse = PostsResponse(yourPosts: [], restPosts: [])
+    @State private var posts: PostsResponse = PostsResponse(yourPosts: [],notJoinedPosts: [])
     @State private var joinedposts:PostsResponse_other = PostsResponse_other(postsWhereMember : [])
     var logoutAction: () -> Void // Accept logout closure
     
@@ -336,7 +334,7 @@ struct MainView: View {
                 print("new")
                 newPosts.yourPosts.append(newPost)
             } else {
-                newPosts.restPosts.append(newPost)
+                newPosts.notJoinedPosts.append(newPost)
             }
             
             // Assign back to trigger view update
@@ -348,8 +346,8 @@ struct MainView: View {
             
             if let index = newPosts.yourPosts.firstIndex(where: { $0.postId == updatedPost.postId }) {
                 newPosts.yourPosts[index] = updatedPost
-            } else if let index = newPosts.restPosts.firstIndex(where: { $0.postId == updatedPost.postId }) {
-                newPosts.restPosts[index] = updatedPost
+            } else if let index = newPosts.notJoinedPosts.firstIndex(where: { $0.postId == updatedPost.postId }) {
+                newPosts.notJoinedPosts[index] = updatedPost
             }
             
             self.posts = newPosts
@@ -358,7 +356,7 @@ struct MainView: View {
         signalRManager.onPostDeleted = { postId in
             var newPosts = self.posts
             newPosts.yourPosts.removeAll { $0.postId == postId }
-            newPosts.restPosts.removeAll { $0.postId == postId }
+            newPosts.notJoinedPosts.removeAll { $0.postId == postId }
             self.posts = newPosts
         }
     }
@@ -413,7 +411,7 @@ struct MainView: View {
                                 currentPrice: Double(yourPost.currentPrice),
                                 source: "yourPost"
                             )
-                        } + posts.restPosts.map { restPost in
+                        } + posts.notJoinedPosts.map { restPost in
                             UnifiedPost(
                                 id: restPost.postId ,
                                 members: restPost.members,
@@ -525,15 +523,15 @@ struct MainView: View {
     
 }
 struct AuthenticationView: View {
+    @Binding var isAuthenticated: Bool
     @State private var showLogin = true
-    var onAuthenticated: () -> Void
 
     var body: some View {
         VStack {
             if showLogin {
-                LoginView(onLoginSuccess: onAuthenticated)
+                LoginView(isAuthenticated: $isAuthenticated)
             } else {
-                RegistrationView(onRegistrationSuccess: onAuthenticated)
+                RegistrationView(isAuthenticated: $isAuthenticated)
             }
 
             Button(action: {

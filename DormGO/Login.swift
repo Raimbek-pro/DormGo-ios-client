@@ -119,7 +119,8 @@ struct LoginView: View {
     @State private var password = ""
     @State private var message = ""
     @State private var jwt: String? = nil
-    var onLoginSuccess: () -> Void
+   // var onLoginSuccess: () -> Void
+    @Binding var isAuthenticated: Bool
     
     private func validateInput() -> Bool {
         if !isValidEmail(email) {
@@ -215,14 +216,14 @@ struct LoginView: View {
                                            if let responseObject = responseObject {
                                                clearKeychainItem(tokenType: "access_token")
                                                clearKeychainItem(tokenType: "refresh_token")
-                                               if let accessToken = responseObject["access_token"] as? String,
-                                                  let refreshToken = responseObject["refresh_token"] as? String {
+                                               if let accessToken = responseObject["accessToken"] as? String,
+                                                  let refreshToken = responseObject["refreshToken"] as? String {
                                                    // Save both tokens to Keychain
                                                    if saveJWTToKeychain(token: accessToken, tokenType: "access_token"),
                                                       saveJWTToKeychain(token: refreshToken, tokenType: "refresh_token") {
                                                        message = "Login successful! JWT and refresh token saved securely."
                                                        jwt = accessToken // Update state with the access token
-                                                       onLoginSuccess()
+                                                       isAuthenticated = true
                                                        // Proceed with protected request
                                                        APIManager.shared.sendProtectedRequest { protectedResponse in
                                                            print("Fetched Protected Data:")

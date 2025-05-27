@@ -144,7 +144,7 @@ class APIManager {
         }
 
         // Prepare the request
-        let refreshURL = endpoint("api/refresh-tokens")
+        let refreshURL = endpoint("api/tokens/refresh")
         var request = URLRequest(url: refreshURL)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -327,8 +327,8 @@ struct RegistrationView: View {
     @State private var password = ""
     @State private var message = ""
     @State private var jwt: String? = nil // Store JWT token here
-    var onRegistrationSuccess: () -> Void // Closure passed for success handling
-    
+    //var onRegistrationSuccess: () -> Void // Closure passed for success handling
+    @Binding var isAuthenticated: Bool
     private func validateInput() -> Bool {
         if !isValidEmail(email) {
             message = "Invalid email. Must end with @kbtu.kz"

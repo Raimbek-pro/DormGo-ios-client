@@ -32,7 +32,7 @@ struct PostsResponse_other: Codable {
 // Root response model
 struct PostsResponse: Codable {
     var yourPosts: [Post]
-    var restPosts: [Post]
+    var notJoinedPosts: [Post]
 }
 //https://8035-2-135-65-38.ngrok-free.app
 let baseURL = URL(string: "https://1541-37-99-17-207.ngrok-free.app")! // https://dormgo.azurewebsites.net    http://localhost:8080
@@ -769,7 +769,7 @@ class PostAPIManager{
          }
 
          // Prepare the request
-         let refreshURL = endpoint("api/refresh-tokens")
+         let refreshURL = endpoint("api/tokens/refresh")
          var request = URLRequest(url: refreshURL)
          request.httpMethod = "PUT"
          request.setValue("application/json", forHTTPHeaderField: "Content-Type")
