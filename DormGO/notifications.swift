@@ -173,11 +173,12 @@ class SignalRManager: ObservableObject, ConnectionHandler {
         
         hubConnection?.on(method: "PostDeleted", callback: { [weak self] (postId: String) in
         
-         
+            print("Received post deletion with id: \(postId)")
 
             DispatchQueue.main.async { [weak self] in
                     self?.onPostDeleted?(postId)
                 }
+           
         })
   
     }

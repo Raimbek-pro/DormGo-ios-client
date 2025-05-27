@@ -21,11 +21,16 @@ struct Post: Codable {
     let latitude: Double
     let longitude: Double
     let createdAt: String
+    let updatedAt: String? 
     let maxPeople: Int
-    let creator : ProtectedResponse
+    let creator: ProtectedResponse
     let members: [ProtectedResponse]
+    
+    enum CodingKeys: String, CodingKey {
+        case postId = "id" // Correct: postId property is mapped to "id" key in JSON
+        case description, currentPrice, latitude, longitude, createdAt, updatedAt, maxPeople, creator, members
+    }
 }
-
 struct PostsResponse_other: Codable {
     let postsWhereMember: [Post]
 }
@@ -33,6 +38,7 @@ struct PostsResponse_other: Codable {
 struct PostsResponse: Codable {
     var yourPosts: [Post]
     var notJoinedPosts: [Post]
+    var joinedPosts : [Post]
 }
 //https://8035-2-135-65-38.ngrok-free.app
 let baseURL = URL(string: "https://1541-37-99-17-207.ngrok-free.app")! // https://dormgo.azurewebsites.net    http://localhost:8080
@@ -926,7 +932,7 @@ class PostAPIManager{
                             //  saveToModel(email: protectedResponse.email, name: protectedResponse.name)
                             completion(postsResponse)
                         } catch {
-                            print("Failed to decode response: \(error.localizedDescription)")
+                            print("улетай: \(error.localizedDescription)")
                             completion(nil)
                         }
                     } else {

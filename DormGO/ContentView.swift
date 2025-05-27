@@ -46,15 +46,15 @@ struct ContentView: View {
            // Initialize the `user` and `posts` with default values
            if isPreview {
                _user = State(initialValue: ProfileInfo(id: "1", email: "preview@example.com", name: "Preview User", registeredAt: Date()))
-               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: []))  // Simulated empty posts for preview
+               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: [], joinedPosts: []))  // Simulated empty posts for preview
                isAuthenticated = true  // Simulate logged-in state for preview
            } else if let _ = getJWTFromKeychain(tokenType: "access_token") {
                _user = State(initialValue: ProfileInfo(id: "1", email: "user@example.com", name: "Authenticated User", registeredAt: Date()))
-               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: []))  // Add real posts if necessary
+               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: [], joinedPosts: []))  // Add real posts if necessary
                isAuthenticated = true
            } else {
                _user = State(initialValue: ProfileInfo(id: "1", email: "", name: "", registeredAt: Date()))
-               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: []))  // Empty posts if not authenticated
+               _posts = State(initialValue: PostsResponse(yourPosts: [], notJoinedPosts: [], joinedPosts: []))  // Empty posts if not authenticated
                isAuthenticated = false
            }
        }
@@ -314,7 +314,7 @@ struct MainView: View {
     @State private var isSheet2Presented = false
     let columns = [GridItem(.adaptive(minimum: 150))]
     @State private var user: ProfileInfo
-    @State private var posts: PostsResponse = PostsResponse(yourPosts: [],notJoinedPosts: [])
+    @State private var posts: PostsResponse = PostsResponse(yourPosts: [],notJoinedPosts: [], joinedPosts: [])
     @State private var joinedposts:PostsResponse_other = PostsResponse_other(postsWhereMember : [])
     var logoutAction: () -> Void // Accept logout closure
     
