@@ -624,7 +624,7 @@ struct SheetContent: View {
             if isUserPost {
                 userPostButtonsSection
             }
-            ChatView(chatHub: chatHub, user: user, postId: post.postId)
+            ChatView(chatHub: chatHub, user: user, postId: post.postId,post:post)
             Spacer()
         }
         .padding()
@@ -737,7 +737,7 @@ struct SheetContent_joined: View {
             actionButtonsSection
 
            
-            ChatView(chatHub: chatHub, user: user, postId: post.postId)
+            ChatView(chatHub: chatHub, user: user, postId: post.postId, post: post)
 
             Spacer()
         }
@@ -812,13 +812,15 @@ struct ChatView: View {
     let user: ProfileInfo
     let postId: String
     let sentAt: String
-    init(chatHub: ChatHub,user: ProfileInfo, postId: String) {
+    let post:Post
+    init(chatHub: ChatHub,user: ProfileInfo, postId: String,post:Post) {
         self.chatHub = chatHub
          // 👈 Setup
     
         self.user = user
         self.postId = postId
         self.sentAt = ""
+        self.post = post
     
         
     }
@@ -847,14 +849,14 @@ struct ChatView: View {
         PostAPIManager.shared.sendMessageToPost(postId: postId, message: newMessage) { chatResponse in
             if let chatResponse = chatResponse {
              
-                let sender = Sender(email: user.email, name: user.name)
+                let sender = Sender(email: user.email, name: user.name, id: user.id)
                 
                 // Create a new Message object
                 let newMessage = Message(
                     messageId: UUID().uuidString,
                     content: chatResponse.message.content,
                     sender: sender,
-                    sentAt:  sentAt, updatedAt: nil
+                    sentAt:  sentAt, updatedAt: nil, post:post
               
                 )
                 

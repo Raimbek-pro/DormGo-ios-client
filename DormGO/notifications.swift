@@ -399,16 +399,23 @@ struct Message: Identifiable, Decodable {
     let messageId: String
     let content: String
     let sender: Sender
-    let sentAt:String
+    let sentAt: String
     let updatedAt: String?
+    let post: Post // Include the related post
+
     // Conforming to Identifiable by using messageId as the ID
     var id: String { messageId }
+
+    enum CodingKeys: String, CodingKey {
+        case messageId = "id" // map JSON "id" to property messageId
+        case content, sender, sentAt, updatedAt, post
+    }
 }
+
 struct Sender: Decodable {
     let email: String
     let name: String
-    
-
+    let id: String
 }
 struct ChatSender: Decodable {
     let userId: String
