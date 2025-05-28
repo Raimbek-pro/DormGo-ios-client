@@ -31,7 +31,46 @@ struct PostResponse_Update: Codable {
     let post: PostDetails
 }
 
+struct PostCreate: Codable {
+    let postId: String
+    let title: String
+    let createdAt: String
+    let creatorName: String
+    let maxPeople: Int
+    let description :String
+    // Extra fields not coming from JSON
+    var currentPrice : Double = 0
+    var latitude : Double = 0
+    var longitude : Double = 0
+    var creator: ProtectedResponse = ProtectedResponse(email: "", name: "")
+    var members: [ProtectedResponse] = []
 
+    enum CodingKeys: String, CodingKey {
+        case postId = "id"
+        case title = "title"
+        case createdAt = "createdAt"
+        case creatorName = "creatorName"
+        case maxPeople = "maxPeople"
+        case description = "description"
+        // ⚠️ Don’t include isJoined or note here — so they won’t be decoded or encoded
+    }
+}
+extension PostCreate {
+    func toPost() -> Post {
+        return Post(
+            postId: self.postId,
+            description: self.description,
+            currentPrice: self.currentPrice,
+            latitude: self.latitude, // ⚠️ typo here
+            longitude: self.longitude,
+            createdAt: self.createdAt,
+            updatedAt: nil, // If you don’t have it, default to nil
+            maxPeople: self.maxPeople,
+            creator: self.creator,
+            members: self.members
+        )
+    }
+}
 class CustomLogger: Logger {
     let dateFormatter: DateFormatter
     weak var connectionHandler: ConnectionHandler?
@@ -71,8 +110,8 @@ class SignalRManager: ObservableObject, ConnectionHandler {
 //    @Published var posts_update: [PostDetails] = []
     private var customLogger: CustomLogger?
     
-    var onPostCreated: ((Post) -> Void)?
-      var onPostUpdated: ((Post) -> Void)?
+    var onPostCreated: ((PostCreate) -> Void)?
+      var onPostUpdated: ((PostCreate) -> Void)?
       var onPostDeleted: ((String) -> Void)?
         init() {
             self.customLogger = CustomLogger(connectionHandler:  self)
@@ -125,7 +164,7 @@ class SignalRManager: ObservableObject, ConnectionHandler {
         hubConnection?.stop()
     }
 
-    private func handlemessage_pc(type:Bool,postDto:Post){
+    private func handlemessage_pc(type:Bool,postDto:PostCreate){
         let timestamp = Date()
         print("Received post at \(timestamp) with type: \(type)")  // Log the time and type
 
@@ -145,19 +184,18 @@ class SignalRManager: ObservableObject, ConnectionHandler {
        // let hubUrl = endpoint("api/posthub")
         
     
-        hubConnection?.on(method: "PostCreated", callback: { [weak self] (type: Bool, postDto: Post) in
+        hubConnection?.on(method: "PostCreated", callback: { [weak self] (postDto: PostCreate) in
             guard let self = self else {
-                   print("Self is nil, cannot handle the post")
-                   return
-               }
-
-            
-                self.handlemessage_pc(type: type, postDto: postDto)
-        
-          
+                
+                print("Self is nil, cannot handle the post")
+                return
+            }
+            self.onPostCreated?(postDto)
+            // Handle the postDto here
+            print("New post created: \(postDto)")
         })
         
-        hubConnection?.on(method: "PostUpdated", callback: { [weak self] ( postDto: Post) in
+        hubConnection?.on(method: "PostUpdated", callback: { [weak self] ( postDto: PostCreate) in
          
          //   print("Received post update at \(timestamp) with message: \(postDto.message)") // Log the time and type
 

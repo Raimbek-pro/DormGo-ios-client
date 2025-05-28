@@ -41,7 +41,7 @@ struct PostsResponse: Codable {
     var joinedPosts : [Post]
 }
 //https://8035-2-135-65-38.ngrok-free.app
-let baseURL = URL(string: "https://1541-37-99-17-207.ngrok-free.app")! // https://dormgo.azurewebsites.net    http://localhost:8080
+let baseURL = URL(string: "https://f720-37-99-40-218.ngrok-free.app")! // https://dormgo.azurewebsites.net    http://localhost:8080
 
 
 

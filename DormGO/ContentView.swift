@@ -326,7 +326,11 @@ struct MainView: View {
      
     }
     private func setupSignalRCallbacks() {
-        signalRManager.onPostCreated = { newPost in
+        print("opa")
+        signalRManager.onPostCreated = { newPostCreate in
+            print("lmaboo before toPost")
+            let newPost = newPostCreate.toPost()
+
             // Create mutable copy
             var newPosts = self.posts
             print("lmaboo")
@@ -341,7 +345,8 @@ struct MainView: View {
             self.posts = newPosts
         }
         
-        signalRManager.onPostUpdated = { updatedPost in
+        signalRManager.onPostUpdated = { updatedPostCreate in
+            let updatedPost = updatedPostCreate.toPost()
             var newPosts = self.posts
             
             if let index = newPosts.yourPosts.firstIndex(where: { $0.postId == updatedPost.postId }) {
